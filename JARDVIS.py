@@ -25,11 +25,13 @@ st.caption("Beta")
 def main():
 
     # Load environment variables
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("❌ OPENAI_API_KEY not found in .env")
+    #load_dotenv()
+    #api_key = os.getenv("OPENAI_API_KEY")
+    #if not api_key:
+    #   raise RuntimeError("❌ OPENAI_API_KEY not found in .env")
+    #^ above not needed for streamlit
 
+    api_key = st.secrets["OPENAI_API_KEY"]
 
     # Prepare the Db
         # Embedding functions is the same function used to create the database
