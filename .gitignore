@@ -1,10 +1,6 @@
-# venv & caches
 venv/
 __pycache__/
 *.pyc
-
-# local vector DB
 chroma/
-
-# secrets
 .env
+.DS_Store
