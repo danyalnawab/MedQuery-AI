@@ -19,8 +19,8 @@ Answer the question based only on the following context:
 Answer the question based on the above context: {question}
 """
 
-st.title("JARDVIS MK I")
-st.caption("Beta")
+st.title("Integrative Medicine Intelligence")
+st.caption("Integrative Medicine Query Assistant\nAn experimental AI chatbot designed to help users explore and understand concepts from integrative and holistic medicine literature.\n\n⚠️ Disclaimer: This tool is not intended to diagnose, treat, or replace professional medical advice. Always consult a qualified healthcare provider regarding any medical condition.")
 
 def main():
 
