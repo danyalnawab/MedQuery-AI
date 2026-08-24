@@ -4,3 +4,4 @@ __pycache__/
 chroma/
 .env
 .DS_Store
+.superpowers/
