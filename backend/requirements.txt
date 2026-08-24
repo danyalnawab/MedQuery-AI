@@ -1,0 +1,9 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+langchain==0.3.27
+langchain-community==0.3.30
+langchain-openai==0.3.35
+chromadb==1.1.1
+python-dotenv==1.1.1
+pytest==8.3.4
+httpx==0.28.1
