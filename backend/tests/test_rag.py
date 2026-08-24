@@ -93,3 +93,53 @@ def test_retrieve_returns_empty_for_no_results():
     context, sources = retrieve("query", FakeDB([]))
     assert context == ""
     assert sources == []
+
+
+from backend.rag import stream_answer
+
+
+class FakeStreamChunk:
+    def __init__(self, content):
+        self.content = content
+
+
+class FakeStreamingLLM(FakeLLM):
+    def __init__(self, response_content, stream_chunks):
+        super().__init__(response_content)
+        self.stream_chunks = stream_chunks
+
+    def stream(self, prompt):
+        return iter(FakeStreamChunk(c) for c in self.stream_chunks)
+
+
+def test_stream_answer_yields_no_match_when_below_threshold():
+    db = FakeDB([])
+    llm = FakeStreamingLLM("standalone", [])
+    events = list(stream_answer("question", [], db, llm))
+    assert events == [{"no_match": True}]
+
+
+def test_stream_answer_yields_tokens_then_done_with_sources():
+    docs = [(FakeDocument("chunk", {"source": "a.md"}), 0.9)]
+    db = FakeDB(docs)
+    llm = FakeStreamingLLM("standalone question", ["Hel", "lo"])
+    events = list(stream_answer("question", [], db, llm))
+    assert events == [
+        {"token": "Hel"},
+        {"token": "lo"},
+        {"done": True, "sources": ["a.md"]},
+    ]
+
+
+def test_stream_answer_condenses_question_when_history_present():
+    docs = [(FakeDocument("chunk", {"source": "a.md"}), 0.9)]
+    db = FakeDB(docs)
+    llm = FakeStreamingLLM("condensed standalone question", ["ok"])
+    history = [
+        {"role": "user", "content": "Is X safe?"},
+        {"role": "assistant", "content": "Yes."},
+    ]
+    events = list(stream_answer("What about kids?", history, db, llm))
+    assert events[-1] == {"done": True, "sources": ["a.md"]}
+    assert llm.last_prompt is not None
+    assert "What about kids?" in llm.last_prompt

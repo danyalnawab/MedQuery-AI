@@ -47,3 +47,32 @@ def retrieve(query: str, db, k: int = 3) -> tuple[str, list[str]]:
     context = "\n\n---\n\n".join(doc.page_content for doc, _ in results)
     sources = [doc.metadata.get("source") for doc, _ in results]
     return context, sources
+
+
+ANSWER_PROMPT = ChatPromptTemplate.from_template(
+    """Answer the question based only on the following context:
+
+{context}
+
+---
+
+Conversation history:
+{history}
+
+Answer the question based on the above context: {question}"""
+)
+
+
+def stream_answer(message: str, history: list[dict], db, llm):
+    standalone_query = condense_question(message, history, llm)
+    context, sources = retrieve(standalone_query, db)
+    if not sources:
+        yield {"no_match": True}
+        return
+    prompt = ANSWER_PROMPT.format(
+        context=context, history=format_history_for_prompt(history), question=message
+    )
+    for chunk in llm.stream(prompt):
+        if chunk.content:
+            yield {"token": chunk.content}
+    yield {"done": True, "sources": sources}
