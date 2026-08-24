@@ -1,4 +1,4 @@
-from backend.rag import is_below_relevance_threshold, format_history_for_prompt
+from backend.rag import is_below_relevance_threshold, format_history_for_prompt, condense_question
 
 
 def test_is_below_relevance_threshold_empty_results():
@@ -23,3 +23,36 @@ def test_format_history_for_prompt_multiple_turns():
         {"role": "assistant", "content": "Yes, generally."},
     ]
     assert format_history_for_prompt(history) == "User: Is X safe?\nAssistant: Yes, generally."
+
+
+class FakeLLMResponse:
+    def __init__(self, content):
+        self.content = content
+
+
+class FakeLLM:
+    def __init__(self, response_content):
+        self.response_content = response_content
+        self.last_prompt = None
+
+    def invoke(self, prompt):
+        self.last_prompt = prompt
+        return FakeLLMResponse(self.response_content)
+
+
+def test_condense_question_returns_message_unchanged_when_no_history():
+    llm = FakeLLM("should not be used")
+    result = condense_question("What about kids?", [], llm)
+    assert result == "What about kids?"
+
+
+def test_condense_question_calls_llm_when_history_present():
+    llm = FakeLLM("Is X safe for children?")
+    history = [
+        {"role": "user", "content": "Is X safe?"},
+        {"role": "assistant", "content": "Yes, generally."},
+    ]
+    result = condense_question("What about kids?", history, llm)
+    assert result == "Is X safe for children?"
+    assert "What about kids?" in llm.last_prompt
+    assert "Is X safe?" in llm.last_prompt
