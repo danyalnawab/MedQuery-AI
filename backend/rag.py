@@ -38,3 +38,12 @@ def condense_question(message: str, history: list[dict], llm) -> str:
     )
     response = llm.invoke(prompt)
     return response.content.strip()
+
+
+def retrieve(query: str, db, k: int = 3) -> tuple[str, list[str]]:
+    results = db.similarity_search_with_relevance_scores(query, k=k)
+    if is_below_relevance_threshold(results):
+        return "", []
+    context = "\n\n---\n\n".join(doc.page_content for doc, _ in results)
+    sources = [doc.metadata.get("source") for doc, _ in results]
+    return context, sources
