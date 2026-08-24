@@ -1,4 +1,10 @@
-from backend.rag import is_below_relevance_threshold, format_history_for_prompt, condense_question, retrieve
+from backend.rag import (
+    is_below_relevance_threshold,
+    format_history_for_prompt,
+    condense_question,
+    retrieve,
+    stream_answer,
+)
 
 
 def test_is_below_relevance_threshold_empty_results():
@@ -93,9 +99,6 @@ def test_retrieve_returns_empty_for_no_results():
     context, sources = retrieve("query", FakeDB([]))
     assert context == ""
     assert sources == []
-
-
-from backend.rag import stream_answer
 
 
 class FakeStreamChunk:
