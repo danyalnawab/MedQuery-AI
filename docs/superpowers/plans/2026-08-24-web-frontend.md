@@ -672,9 +672,11 @@ git commit -m "Add FastAPI /chat SSE endpoint"
 
 - [ ] **Step 1: Start the backend**
 
+Run from the **repo root** (not `backend/`) — `main.py` imports via `from backend.rag import ...`, an absolute import that requires the repo root on `sys.path`:
+
 ```bash
 source venv/bin/activate
-cd backend && uvicorn main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8000
 ```
 
 - [ ] **Step 2: Send a real request in a second terminal**
@@ -995,9 +997,11 @@ git commit -m "Build chat UI with SSE streaming and sources display"
 
 - [ ] **Step 1: Start the backend**
 
+Run from the **repo root** (not `backend/`) — `main.py` imports via `from backend.rag import ...`, an absolute import that requires the repo root on `sys.path`:
+
 ```bash
 source venv/bin/activate
-cd backend && uvicorn main:app --reload --port 8000
+uvicorn backend.main:app --reload --port 8000
 ```
 
 - [ ] **Step 2: Start the frontend in a second terminal**
