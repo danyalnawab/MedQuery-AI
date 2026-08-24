@@ -28,9 +28,9 @@ def generate_data_store():             ## DEL TS helper function to clean things
 
 
 
-def load_documents():
+def load_documents():                           # textloader
     loader = DirectoryLoader(DATA_PATH,
-                              glob="**/*.md",    # **/*.md matches every .md in any subfolder;
+                              glob="**/*.md",    # **/*.md matches every .md in any subfolder; (restricted to md via "**/*.md" but can be other file types if changed)
                                 recursive=True,   # recursive=True allows deep traversal of all nested folders
                                 loader_cls=TextLoader, ## DEL makes it simpler as I am only reading md files and the otehr was throwing me an error
                                 loader_kwargs={"encoding": "utf-8"}
