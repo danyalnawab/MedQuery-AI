@@ -8,6 +8,7 @@ export type Message = {
   content: string;
   sources?: string[];
   noMatch?: boolean;
+  error?: string;
 };
 
 export function ChatMessage({ message }: { message: Message }) {
@@ -20,7 +21,11 @@ export function ChatMessage({ message }: { message: Message }) {
         className={`max-w-[80%] p-3 ${isUser ? "bg-primary text-primary-foreground" : "bg-muted"}`}
       >
         <p className="whitespace-pre-wrap">
-          {message.noMatch ? "Unable to find matching results." : message.content}
+          {message.error
+            ? message.error
+            : message.noMatch
+              ? "Unable to find matching results."
+              : message.content}
         </p>
         {message.sources && message.sources.length > 0 && (
           <div className="mt-2 text-sm">

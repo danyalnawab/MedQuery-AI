@@ -37,6 +37,8 @@ export function ChatWindow() {
             next[next.length - 1] = { ...last, sources: event.sources };
           } else if ("no_match" in event) {
             next[next.length - 1] = { ...last, noMatch: true };
+          } else if ("error" in event) {
+            next[next.length - 1] = { ...last, error: event.error };
           }
           return next;
         });
@@ -57,6 +59,19 @@ export function ChatWindow() {
 
   return (
     <div className="flex h-screen flex-col">
+      <div className="border-b bg-muted p-4">
+        <h1 className="text-lg font-semibold">MedQuery-AI</h1>
+        <p className="text-sm text-muted-foreground">
+          Integrative Medicine Query Assistant — an experimental AI chatbot
+          designed to help users explore and understand concepts from
+          integrative and holistic medicine literature.
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          ⚠️ Disclaimer: This tool is not intended to diagnose, treat, or
+          replace professional medical advice. Always consult a qualified
+          healthcare provider regarding any medical condition.
+        </p>
+      </div>
       <ScrollArea className="flex-1 p-4">
         <div className="flex flex-col gap-3">
           {messages.map((message, i) => (

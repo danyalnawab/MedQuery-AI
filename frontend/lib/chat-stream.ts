@@ -3,7 +3,8 @@ export type ChatTurn = { role: "user" | "assistant"; content: string };
 export type ChatEvent =
   | { token: string }
   | { done: true; sources: string[] }
-  | { no_match: true };
+  | { no_match: true }
+  | { error: string };
 
 export async function streamChat(
   message: string,
@@ -15,6 +16,10 @@ export async function streamChat(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message, history }),
   });
+
+  if (!response.ok) {
+    throw new Error(`/chat returned ${response.status}`);
+  }
 
   if (!response.body) {
     throw new Error("No response body from /chat");

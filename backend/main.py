@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -10,6 +11,8 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import BaseModel
 
 from backend.rag import stream_answer
+
+logger = logging.getLogger(__name__)
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
@@ -27,7 +30,7 @@ app.add_middleware(
 
 embedding_function = OpenAIEmbeddings()
 db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
-llm = ChatOpenAI()
+llm = ChatOpenAI(temperature=0)
 
 
 class ChatTurn(BaseModel):
@@ -49,7 +52,11 @@ def chat(request: ChatRequest):
     history = [turn.model_dump() for turn in request.history]
 
     def event_stream():
-        for event in stream_answer(request.message, history, db, llm):
-            yield format_sse(event)
+        try:
+            for event in stream_answer(request.message, history, db, llm):
+                yield format_sse(event)
+        except Exception:
+            logger.exception("chat stream failed")
+            yield format_sse({"error": "Something went wrong generating a response."})
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

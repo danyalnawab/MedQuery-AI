@@ -73,8 +73,12 @@ class FakeDocument:
 class FakeDB:
     def __init__(self, results):
         self.results = results
+        self.last_query = None
+        self.last_k = None
 
     def similarity_search_with_relevance_scores(self, query, k=3):
+        self.last_query = query
+        self.last_k = k
         return self.results
 
 
@@ -146,3 +150,5 @@ def test_stream_answer_condenses_question_when_history_present():
     assert events[-1] == {"done": True, "sources": ["a.md"]}
     assert llm.last_prompt is not None
     assert "What about kids?" in llm.last_prompt
+    assert db.last_query == "condensed standalone question"
+    assert db.last_k == 3
