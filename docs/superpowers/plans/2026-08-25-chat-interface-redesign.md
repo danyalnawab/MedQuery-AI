@@ -831,10 +831,6 @@ cd frontend && npm run dev
 
 If any check above fails or looks wrong (e.g. auto-scroll doesn't trigger, a color reads as too low-contrast, the thinking indicator doesn't clear on error), fix the relevant file from Tasks 1–8 and re-verify. Do not proceed to Step 8 until everything above passes.
 
-- [ ] **Step 8: Push the updated branch**
+- [ ] **Step 8: Report readiness to push**
 
-```bash
-git push
-```
-
-PR #2 updates automatically since it tracks `feature/web-frontend`. Do not merge without the user's go-ahead.
+Do not run `git push` as part of this task. Report that all checks in Steps 2–7 passed and the branch is ready to push; the controller confirms with the user before pushing (per this plan's Global Constraints — no push without the user's go-ahead). PR #2 would update automatically since it tracks `feature/web-frontend`, once pushed.
