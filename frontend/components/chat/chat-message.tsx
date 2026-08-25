@@ -32,8 +32,8 @@ export function ChatMessage({ message }: { message: Message }) {
             </button>
             {sourcesOpen && (
               <ul className="mt-1 list-disc pl-4 opacity-70">
-                {message.sources.map((source) => (
-                  <li key={source}>{source}</li>
+                {message.sources.map((source, i) => (
+                  <li key={`${source}-${i}`}>{source}</li>
                 ))}
               </ul>
             )}

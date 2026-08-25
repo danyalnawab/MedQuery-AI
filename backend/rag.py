@@ -17,9 +17,15 @@ def format_history_for_prompt(history: list[dict]) -> str:
 
 
 CONDENSE_PROMPT = ChatPromptTemplate.from_template(
-    """Given the conversation history and a follow-up question, rephrase the \
-follow-up question to be a standalone question that includes any necessary \
-context from the history.
+    """Given the conversation history and a follow-up question, decide whether \
+the follow-up question is actually related to that history.
+
+- If it is related (e.g. it uses pronouns, "what about...", or otherwise \
+depends on the prior turns to make sense), rephrase it into a standalone \
+question that includes the necessary context from the history.
+- If it is NOT related — a new, independent topic — return the follow-up \
+question completely unchanged. Do not pull in unrelated terms from the \
+history just because history exists.
 
 Conversation history:
 {history}
