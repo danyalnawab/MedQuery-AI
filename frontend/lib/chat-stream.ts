@@ -11,7 +11,10 @@ export async function streamChat(
   history: ChatTurn[],
   onEvent: (event: ChatEvent) => void,
 ): Promise<void> {
-  const response = await fetch("http://localhost:8000/chat", {
+  // Same-origin call: the Next.js server proxies `/api/chat` to the FastAPI
+  // backend (see `app/api/chat/route.ts`). Keeping this relative means no
+  // backend hostname is ever baked into the browser bundle.
+  const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message, history }),

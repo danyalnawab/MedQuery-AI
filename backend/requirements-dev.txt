@@ -1,0 +1,5 @@
+# Test-only dependencies. Not installed in the Docker image.
+#   pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+-r requirements.txt
+pytest==8.3.4
+httpx==0.28.1
