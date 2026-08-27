@@ -55,7 +55,7 @@ export function ChatWindow() {
         const next = [...prev]
         next[next.length - 1] = {
           ...next[next.length - 1],
-          content: "Something went wrong reaching the server. Please try again.",
+          error: "Something went wrong reaching the server. Please try again.",
         }
         return next
       })
