@@ -1,0 +1,62 @@
+import json
+import logging
+import os
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from langchain_community.vectorstores import Chroma
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from pydantic import BaseModel
+
+from backend.rag import stream_answer
+
+logger = logging.getLogger(__name__)
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CHROMA_PATH = os.path.join(BASE_DIR, "chroma")
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["POST"],
+    allow_headers=["*"],
+)
+
+embedding_function = OpenAIEmbeddings()
+db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+llm = ChatOpenAI(temperature=0)
+
+
+class ChatTurn(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    message: str
+    history: list[ChatTurn] = []
+
+
+def format_sse(data: dict) -> str:
+    return f"data: {json.dumps(data)}\n\n"
+
+
+@app.post("/chat")
+def chat(request: ChatRequest):
+    history = [turn.model_dump() for turn in request.history]
+
+    def event_stream():
+        try:
+            for event in stream_answer(request.message, history, db, llm):
+                yield format_sse(event)
+        except Exception:
+            logger.exception("chat stream failed")
+            yield format_sse({"error": "Something went wrong generating a response."})
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
