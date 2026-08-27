@@ -21,20 +21,10 @@ export function ChatWindow() {
   const hasAutoSubmitted = useRef(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  async function sendMessage(text: string) {
-    if (!text.trim() || isStreaming) return
-
-    const userMessage: Message = { role: "user", content: text }
-    const history: ChatTurn[] = messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }))
-
-    setMessages((prev) => [...prev, userMessage, { role: "assistant", content: "" }])
+  async function streamInto(userContent: string, history: ChatTurn[]) {
     setIsStreaming(true)
-
     try {
-      await streamChat(userMessage.content, history, (event) => {
+      await streamChat(userContent, history, (event) => {
         setMessages((prev) => {
           const next = [...prev]
           const last = next[next.length - 1]
@@ -62,6 +52,39 @@ export function ChatWindow() {
     } finally {
       setIsStreaming(false)
     }
+  }
+
+  async function sendMessage(text: string) {
+    if (!text.trim() || isStreaming) return
+
+    const userMessage: Message = { role: "user", content: text }
+    const history: ChatTurn[] = messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }))
+
+    setMessages((prev) => [...prev, userMessage, { role: "assistant", content: "" }])
+    await streamInto(userMessage.content, history)
+  }
+
+  async function regenerateLast() {
+    if (isStreaming || messages.length < 2) return
+    const lastAssistantIndex = messages.length - 1
+    const last = messages[lastAssistantIndex]
+    const priorUser = messages[lastAssistantIndex - 1]
+    if (last.role !== "assistant" || priorUser.role !== "user") return
+
+    const history: ChatTurn[] = messages.slice(0, lastAssistantIndex - 1).map((m) => ({
+      role: m.role,
+      content: m.content,
+    }))
+
+    setMessages((prev) => {
+      const next = [...prev]
+      next[lastAssistantIndex] = { role: "assistant", content: "" }
+      return next
+    })
+    await streamInto(priorUser.content, history)
   }
 
   function handleSubmit() {
@@ -124,6 +147,11 @@ export function ChatWindow() {
                   message.content === "" &&
                   !message.noMatch &&
                   !message.error
+                }
+                onRegenerate={
+                  !isStreaming && i === lastIndex && message.role === "assistant"
+                    ? regenerateLast
+                    : undefined
                 }
               />
             ))}

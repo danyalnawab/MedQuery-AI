@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { AlertTriangle, Check, ChevronDown, Copy, FileText, Sparkles } from "lucide-react"
+import { AlertTriangle, Check, ChevronDown, Copy, FileText, RefreshCw, Sparkles } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -19,9 +19,11 @@ export type Message = {
 export function ChatMessage({
   message,
   isThinking = false,
+  onRegenerate,
 }: {
   message: Message
   isThinking?: boolean
+  onRegenerate?: () => void
 }) {
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -61,16 +63,31 @@ export function ChatMessage({
                     : message.content}
               </p>
             </div>
-            {!isUser && !isAlert && message.content && (
-              <button
-                type="button"
-                onClick={copyContent}
-                aria-label={copied ? "Copied" : "Copy message"}
-                className="flex w-fit items-center gap-1 self-end text-xs text-muted-foreground opacity-0 transition-opacity group-hover/message:opacity-100 hover:text-foreground focus-visible:opacity-100"
-              >
-                {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                {copied ? "Copied" : "Copy"}
-              </button>
+            {!isUser && (onRegenerate || (!isAlert && message.content)) && (
+              <div className="flex w-fit items-center gap-3 self-end text-xs text-muted-foreground opacity-0 transition-opacity group-hover/message:opacity-100 focus-within:opacity-100">
+                {!isAlert && message.content && (
+                  <button
+                    type="button"
+                    onClick={copyContent}
+                    aria-label={copied ? "Copied" : "Copy message"}
+                    className="flex items-center gap-1 hover:text-foreground"
+                  >
+                    {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                )}
+                {onRegenerate && (
+                  <button
+                    type="button"
+                    onClick={onRegenerate}
+                    aria-label="Regenerate response"
+                    className="flex items-center gap-1 hover:text-foreground"
+                  >
+                    <RefreshCw className="size-3.5" />
+                    Regenerate
+                  </button>
+                )}
+              </div>
             )}
             {message.sources && message.sources.length > 0 && (
               <div className="mt-1">
