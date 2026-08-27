@@ -1,10 +1,12 @@
-"use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ExampleQuestionCard } from "@/components/landing/example-question-card";
-import { EXAMPLE_QUESTIONS } from "@/lib/example-questions";
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Logo } from "@/components/layout/logo"
+import { ExampleQuestionCard } from "@/components/landing/example-question-card"
+import { EXAMPLE_QUESTIONS } from "@/lib/example-questions"
 
 const CORPUS_TOPICS = [
   "Affective Disorders",
@@ -23,19 +25,21 @@ const CORPUS_TOPICS = [
   "Cancer",
   "Substance Abuse",
   "Ophthalmology",
-];
+]
 
 export default function Home() {
-  const router = useRouter();
+  const router = useRouter()
 
   function askExample(question: string) {
-    router.push(`/chat?q=${encodeURIComponent(question)}`);
+    router.push(`/chat?q=${encodeURIComponent(question)}`)
   }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-12 px-6 py-16">
       <section className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-4xl font-bold">MedQuery-AI</h1>
+        <h1>
+          <Logo size="lg" asLink={false} />
+        </h1>
         <p className="max-w-xl text-muted-foreground">
           An AI assistant for exploring integrative medicine literature —
           ask a question and get answers grounded in a curated document
@@ -63,11 +67,13 @@ export default function Home() {
           matches the corpus, the assistant cites its sources; when it
           doesn&apos;t, it says so instead of guessing. The corpus covers:
         </p>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-muted-foreground sm:grid-cols-3">
+        <div className="flex flex-wrap gap-2">
           {CORPUS_TOPICS.map((topic) => (
-            <li key={topic}>{topic}</li>
+            <Badge key={topic} variant="secondary">
+              {topic}
+            </Badge>
           ))}
-        </ul>
+        </div>
       </section>
 
       <footer className="border-t pt-6 text-sm text-muted-foreground">
@@ -76,5 +82,5 @@ export default function Home() {
         healthcare provider regarding any medical condition.
       </footer>
     </div>
-  );
+  )
 }
