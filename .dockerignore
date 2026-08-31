@@ -1,0 +1,49 @@
+# Root build context is used by backend/Dockerfile. Keep only backend/ + chroma/.
+.git
+.github
+.gitignore
+
+# Python local envs / caches
+venv
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+
+# Secrets & local env files (passed in at runtime instead)
+.env
+.env.*
+backend/.env
+
+# Not needed in the backend image
+frontend
+data
+docs
+devlog.md
+*.md
+create_database.py
+query_data.py
+requirements.txt
+
+# Editor / assistant tooling
+.DS_Store
+**/.DS_Store
+.devcontainer
+.agents
+.augment
+.claude
+.codebuddy
+.codewhale
+.continue
+.cursor
+.factory
+.gemini
+.kilocode
+.kiro
+.opencode
+.qoder
+.roo
+.superpowers
+.trae
+.warp
+.windsurf
